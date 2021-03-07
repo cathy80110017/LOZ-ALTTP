@@ -1,10 +1,13 @@
 // By Raccoon
 "use strict";
 
+import Framework from ".";
+import { xy } from "./interface";
 import Point from "./Point";
 
 export default class GameObject {
-  constructor() {
+  constructor(Framework: Framework) {
+    this.Framework = Framework;
     this.absolutePosition = { x: 0, y: 0 };
     this.absoluteRotation = 0;
     this.absoluteScale = { x: 1, y: 1 };
@@ -37,19 +40,20 @@ export default class GameObject {
   private _selfCanvas: HTMLCanvasElement;
   public texture: CanvasImageSource;
   public attachArray: GameObject[];
-  public absolutePosition: XY;
+  public absolutePosition: xy;
   public absoluteRotation: number;
-  public absoluteScale: XY;
+  public absoluteScale: xy;
   public absoluteOpacity: number;
   public systemLayer: number;
   public previousAbsolutePosition: Point;
   public previousWidth: number;
   public previousHeight: number;
   public rotation: number;
-  public scale: XY;
-  public position: XY;
+  public scale: xy;
+  public position: xy;
   public opacity: number;
   public spriteParent?: GameObject; //TODO: check
+  protected Framework: Framework;
 
   public get isObjectChanged(): boolean {
     let isParentChanged = false;
@@ -83,10 +87,9 @@ export default class GameObject {
       y2: this.absolutePosition.y + halfDiagonal,
     };
 
-    //TODO: change import
-    const changedRect = Framework.Game.currentLevel.getChangedRect(
-      Framework.Config.canvasWidth,
-      Framework.Config.canvasHeight
+    const changedRect = this.Framework.game.currentLevel.getChangedRect(
+      this.Framework.config.canvasWidth,
+      this.Framework.config.canvasHeight
     );
 
     if (
@@ -126,7 +129,7 @@ export default class GameObject {
     return Math.sqrt(this.width * this.width + this.height * this.height);
   }
 
-  public get upperLeft(): XY {
+  public get upperLeft(): xy {
     const oriX = -this.width / 2,
       oriY = -this.height / 2,
       positionDif = this.countRotatePoint(
@@ -140,7 +143,7 @@ export default class GameObject {
     };
   }
 
-  public get upperRight(): XY {
+  public get upperRight(): xy {
     const oriX = this.width / 2,
       oriY = -this.height / 2,
       positionDif = this.countRotatePoint(
@@ -154,7 +157,7 @@ export default class GameObject {
     };
   }
 
-  public get lowerLeft(): XY {
+  public get lowerLeft(): xy {
     const oriX = -this.width / 2,
       oriY = this.height / 2,
       positionDif = this.countRotatePoint(
@@ -168,7 +171,7 @@ export default class GameObject {
     };
   }
 
-  public get lowerRight(): XY {
+  public get lowerRight(): xy {
     const oriX = this.width / 2,
       oriY = this.height / 2,
       positionDif = this.countRotatePoint(
@@ -212,8 +215,8 @@ export default class GameObject {
     if (this.width === 0 && this.height === 0) {
       /*this._selfCanvas = Framework.Game._canvas;
                 return this._selfCanvas;*/
-      this._selfCanvas.width = Framework.Game.canvas.width;
-      this._selfCanvas.height = Framework.Game.canvas.height;
+      this._selfCanvas.width = this.Framework.game.canvas.width;
+      this._selfCanvas.height = this.Framework.game.canvas.height;
     }
     return this._selfCanvas;
   }
@@ -231,7 +234,7 @@ export default class GameObject {
   }
 
   public pushSelfToLevel(): void {
-    Framework.Game.pushGameObj(this);
+    this.Framework.game.pushGameObj(this);
   }
 
   public countAbsoluteProperty(): void {
@@ -276,7 +279,7 @@ export default class GameObject {
     }
   }
 
-  public countRotatePoint(point: XY, angle: number): XY {
+  public countRotatePoint(point: xy, angle: number): xy {
     const currentRotate = (angle / 180) * Math.PI;
     const cosRatio = Math.cos(currentRotate);
     const sinRatio = Math.sin(currentRotate);
@@ -308,9 +311,4 @@ export default class GameObject {
   public initTexture(): void {
     return;
   }
-}
-
-export interface XY {
-  x: number;
-  y: number;
 }

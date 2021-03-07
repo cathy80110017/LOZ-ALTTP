@@ -25,14 +25,6 @@ export default class ResourceManager {
   private ajaxProcessing: boolean;
   private _responsedResource: Map<string, resource>;
   private _intervalID: null | number;
-  private static instance: ResourceManager;
-
-  public static getInstance(): ResourceManager {
-    if (!this.instance) {
-      this.instance = new ResourceManager();
-    }
-    return this.instance;
-  }
 
   public loadImage(requestOption: requestOption): resource {
     if (this._responsedResource.has(requestOption.id)) {

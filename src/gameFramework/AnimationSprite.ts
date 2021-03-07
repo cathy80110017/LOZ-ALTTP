@@ -1,11 +1,10 @@
-import DebugInfo from "./DebugInfo";
+import Framework from ".";
 import GameObject from "./GameObject";
-import ResourceManager from "./ResourceManager";
 import Sprite from "./Sprite";
 
 export default class AnimationSprite extends GameObject {
-  constructor(options: AnimationSpriteOption) {
-    super();
+  constructor(Framework: Framework, options: AnimationSpriteOption) {
+    super(Framework);
 
     // 建構子參數判斷
     if (options.url) {
@@ -15,7 +14,7 @@ export default class AnimationSprite extends GameObject {
           typeof options.col === "undefined" ||
           typeof options.row === "undefined"
         ) {
-          DebugInfo.getInstance().Log.error(
+          this.Framework.debugInfo.Log.error(
             "AnimationSprite Error : 建構子參數錯誤，需指定col、row"
           );
           throw new SyntaxError("AnimationSprite constructor arguments error");
@@ -28,13 +27,13 @@ export default class AnimationSprite extends GameObject {
         this.maxIndex = options.url.length - 1;
         this.row = options.url.length;
       } else {
-        DebugInfo.getInstance().Log.error(
+        this.Framework.debugInfo.Log.error(
           "AnimationSprite Error : 建構子參數錯誤，url格式不正確"
         );
         throw new SyntaxError("AnimationSprite constructor arguments error");
       }
     } else {
-      DebugInfo.getInstance().Log.error(
+      this.Framework.debugInfo.Log.error(
         "AnimationSprite Error : 建構子參數錯誤"
       );
       throw new SyntaxError("AnimationSprite constructor arguments error");
@@ -44,7 +43,7 @@ export default class AnimationSprite extends GameObject {
 
     if (typeof options.url === "string") {
       //單張圖片切割
-      ResourceManager.getInstance().loadImage({
+      this.Framework.resourceManager.loadImage({
         id: options.url,
         url: options.url,
       });
@@ -55,11 +54,11 @@ export default class AnimationSprite extends GameObject {
       this._type = "more";
       this._id = options.url;
       options.url.forEach(function (src: string) {
-        this._sprites.push(new Sprite(src));
+        this._sprites.push(new Sprite(this.Framework, src));
       }, this);
       this._isLoadSprite = true;
     } else if (options) {
-      DebugInfo.getInstance().Log.error(
+      this.Framework.debugInfo.Log.error(
         "AnimationSprite 不支援的參數 " + options
       );
     }
@@ -196,10 +195,10 @@ export default class AnimationSprite extends GameObject {
 
   public load(): void {
     if (typeof this._id === "string") {
-      ResourceManager.getInstance().loadImage({ id: this._id, url: this._id });
+      this.Framework.resourceManager.loadImage({ id: this._id, url: this._id });
     } else if (Array.isArray(this._id)) {
       this._id.forEach(function (src) {
-        ResourceManager.getInstance().loadImage({ id: src, url: src });
+        this.Framework.resourceManager.loadImage({ id: src, url: src });
       }, this);
     }
   }
@@ -209,7 +208,7 @@ export default class AnimationSprite extends GameObject {
     // 故意用 closures 隔離變數的scope
     //(function() {
     if (!Array.isArray(this._id)) {
-      this.texture = ResourceManager.getInstance().getResource(
+      this.texture = this.Framework.resourceManager.getResource(
         this._id
       ) as CanvasImageSource;
 
@@ -224,7 +223,7 @@ export default class AnimationSprite extends GameObject {
           -(Number(this.texture.width) / this.col) * (i % this.col),
           -(Number(this.texture.height) / this.row) * Math.floor(i / this.col)
         );
-        this._sprites.push(new Sprite(tmpCanvas));
+        this._sprites.push(new Sprite(this.Framework, tmpCanvas));
       }
       if (this.userInputFrom > this.userInputTo) {
         this._sprites.reverse();
@@ -232,7 +231,7 @@ export default class AnimationSprite extends GameObject {
     } else {
       this._id.forEach(function (imgId) {
         const tmpCanvas = document.createElement("canvas");
-        const tmpImg = ResourceManager.getInstance().getResource(
+        const tmpImg = this.Framework.resourceManager.getResource(
           imgId
         ) as CanvasImageSource;
         const realWidth = Number(tmpImg.width) * this.scale.x;
@@ -241,7 +240,7 @@ export default class AnimationSprite extends GameObject {
         tmpCanvas.height = realHeight;
         const tmpContext = tmpCanvas.getContext("2d");
         tmpContext.drawImage(tmpImg, 0, 0);
-        this._sprites.push(new Sprite(tmpCanvas));
+        this._sprites.push(new Sprite(this.Framework, tmpCanvas));
       }, this);
     }
 
@@ -263,7 +262,7 @@ export default class AnimationSprite extends GameObject {
   }
 
   public draw(painter: GameObject | CanvasRenderingContext2D): void {
-    painter = painter || Framework.Game._context;
+    painter = painter || this.Framework.game.context;
     if (!this._sprites || this._sprites.length == 0) {
       this.initialize();
     }
@@ -287,8 +286,8 @@ export default class AnimationSprite extends GameObject {
 
     sprite.spriteParent = this.spriteParent;
     sprite.layer = this.layer;
-    sprite.options.isDrawBoundry = this.isDrawBoundry;
-    sprite.options.isDrawPace = this.isDrawPace;
+    // sprite.options.isDrawBoundry = this.isDrawBoundry;
+    // sprite.options.isDrawPace = this.isDrawPace;
     sprite._changeFrame = this._changeFrame;
 
     sprite.draw(painter);
@@ -301,7 +300,7 @@ export default class AnimationSprite extends GameObject {
 
   public teardown(): void {
     if (typeof this._id === "string") {
-      ResourceManager.getInstance().destroyResource(this._id);
+      this.Framework.resourceManager.destroyResource(this._id);
     } else if (this._type === "more") {
       this._sprites.forEach(function (s) {
         s.teardown();

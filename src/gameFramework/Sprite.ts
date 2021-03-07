@@ -1,11 +1,16 @@
-import DebugInfo from "./DebugInfo";
-import GameObject, { XY } from "./GameObject";
+import Framework from ".";
+import GameObject from "./GameObject";
 import Point from "./Point";
-import ResourceManager from "./ResourceManager";
+import { isAbout } from "./Utils";
+import { xy } from "./interface";
 
 export default class Sprite extends GameObject {
-  constructor(source: string | CanvasImageSource, options?: SpriteOptions) {
-    super();
+  constructor(
+    Framework: Framework,
+    source: string | CanvasImageSource,
+    options?: SpriteOptions
+  ) {
+    super(Framework);
     this.options = {
       isDrawBoundry: options?.isDrawBoundry ?? false,
       isDrawPace: options?.isDrawPace ?? false,
@@ -14,10 +19,9 @@ export default class Sprite extends GameObject {
       isSection: options?.isSection ?? false,
     };
 
-    //TODO: change import
     if (typeof source === "string") {
       this.id = source;
-      ResourceManager.getInstance().loadImage({ id: source, url: source });
+      this.Framework.resourceManager.loadImage({ id: source, url: source });
       this.type = "image";
       this.pushSelfToLevel();
     } else if (source instanceof HTMLCanvasElement) {
@@ -27,7 +31,7 @@ export default class Sprite extends GameObject {
       this.texture = source;
       this.type = "image";
     } else if (source) {
-      DebugInfo.getInstance().Log.error("Sprite 不支援的參數" + source);
+      this.Framework.debugInfo.Log.error("Sprite 不支援的參數" + source);
     }
   }
 
@@ -38,7 +42,7 @@ export default class Sprite extends GameObject {
 
   public initTexture(): void {
     if (!this.texture) {
-      this.texture = ResourceManager.getInstance().getResource(
+      this.texture = this.Framework.resourceManager.getResource(
         this.id
       ) as CanvasImageSource;
     }
@@ -48,15 +52,15 @@ export default class Sprite extends GameObject {
     super.draw(painter);
     this.countAbsoluteProperty();
     if (!this.texture) {
-      this.texture = ResourceManager.getInstance().getResource(
+      this.texture = this.Framework.resourceManager.getResource(
         this.id
       ) as CanvasImageSource;
     }
-    if (Framework.Game.isBackwardCompatiable) {
+    if (this.Framework.game.isBackwardCompatible) {
       this.testDraw(painter);
       return;
     }
-    painter = painter || Framework.Game._context;
+    painter = painter || this.Framework.game.context;
     let pos;
     let realWidth;
     let realHeight;
@@ -64,11 +68,10 @@ export default class Sprite extends GameObject {
       // 計算縮放後的大小
       if (this.isObjectChanged) {
         if (
-          //TODO: change import
-          !Framework.Util.isAbout(this.absoluteOpacity, 1, 0.00001) ||
-          !Framework.Util.isAbout(this.absoluteScale.x, 1, 0.00001) ||
-          !Framework.Util.isAbout(this.absoluteScale.y, 1, 0.00001) ||
-          !Framework.Util.isAbout(this.absoluteRotation, 0, 0.001)
+          !isAbout(this.absoluteOpacity, 1, 0.00001) ||
+          !isAbout(this.absoluteScale.x, 1, 0.00001) ||
+          !isAbout(this.absoluteScale.y, 1, 0.00001) ||
+          !isAbout(this.absoluteRotation, 0, 0.001)
         ) {
           realWidth = Number(this.texture.width) * this.scale.x;
           realHeight = Number(this.texture.height) * this.scale.y;
@@ -132,10 +135,10 @@ export default class Sprite extends GameObject {
         painter = painter.context; //表示傳進來的其實是GameObject或其 Concrete Class
       }
       if (
-        !Framework.Util.isAbout(this.absoluteOpacity, 1, 0.00001) ||
-        !Framework.Util.isAbout(this.absoluteScale.x, 1, 0.00001) ||
-        !Framework.Util.isAbout(this.absoluteScale.y, 1, 0.00001) ||
-        !Framework.Util.isAbout(this.absoluteRotation, 0, 0.001)
+        !isAbout(this.absoluteOpacity, 1, 0.00001) ||
+        !isAbout(this.absoluteScale.x, 1, 0.00001) ||
+        !isAbout(this.absoluteScale.y, 1, 0.00001) ||
+        !isAbout(this.absoluteRotation, 0, 0.001)
       ) {
         painter.drawImage(this.canvas, pos.x, pos.y);
       } else {
@@ -149,11 +152,11 @@ export default class Sprite extends GameObject {
   }
 
   public testDraw(painter: CanvasRenderingContext2D | GameObject): void {
-    painter = painter || Framework.Game._context;
+    painter = painter || this.Framework.game.context;
     this.countAbsoluteProperty();
     let realWidth, realHeight;
     if (!this.texture) {
-      this.texture = ResourceManager.getInstance().getResource(
+      this.texture = this.Framework.resourceManager.getResource(
         this.id
       ) as CanvasImageSource;
     }
@@ -161,9 +164,9 @@ export default class Sprite extends GameObject {
       // 計算縮放後的大小
       if (this.isObjectChanged) {
         if (
-          !Framework.Util.isAbout(this.absoluteScale.x, 1, 0.00001) ||
-          !Framework.Util.isAbout(this.absoluteScale.y, 1, 0.00001) ||
-          !Framework.Util.isAbout(this.absoluteRotation, 0, 0.001)
+          !isAbout(this.absoluteScale.x, 1, 0.00001) ||
+          !isAbout(this.absoluteScale.y, 1, 0.00001) ||
+          !isAbout(this.absoluteRotation, 0, 0.001)
         ) {
           realWidth = Number(this.texture.width) * this.scale.x;
           realHeight = Number(this.texture.height) * this.scale.y;
@@ -219,9 +222,9 @@ export default class Sprite extends GameObject {
         painter = painter.context; //表示傳進來的其實是GameObject或其 Concrete Class
       }
       if (
-        !Framework.Util.isAbout(this.absoluteScale.x, 1, 0.00001) ||
-        !Framework.Util.isAbout(this.absoluteScale.y, 1, 0.00001) ||
-        !Framework.Util.isAbout(this.absoluteRotation, 0, 0.001)
+        !isAbout(this.absoluteScale.x, 1, 0.00001) ||
+        !isAbout(this.absoluteScale.y, 1, 0.00001) ||
+        !isAbout(this.absoluteRotation, 0, 0.001)
       ) {
         painter.drawImage(
           this.canvas,
@@ -244,11 +247,11 @@ export default class Sprite extends GameObject {
 
   public teardown(): void {
     if (this.type === "image") {
-      ResourceManager.getInstance().destroyResource(this.id);
+      this.Framework.resourceManager.destroyResource(this.id);
     }
   }
 
-  public getSection(upperLeft: XY, bottomRight: XY): Sprite {
+  public getSection(upperLeft: xy, bottomRight: xy): Sprite {
     const tmpCanvas = document.createElement("canvas");
     //取得局部圖片大小
     const realWidth = bottomRight.x - upperLeft.x;
@@ -259,7 +262,7 @@ export default class Sprite extends GameObject {
     const tmpContext = tmpCanvas.getContext("2d");
     //因canvas跟局部圖片大小一樣，就直接從局部圖片的左上角的-x, -y開始畫
     tmpContext.drawImage(this.texture, -upperLeft.x, -upperLeft.y);
-    return new Sprite(tmpCanvas);
+    return new Sprite(this.Framework, tmpCanvas);
   }
 
   public clone(): Sprite {
@@ -267,13 +270,13 @@ export default class Sprite extends GameObject {
     tmpCanvas.width = Number(this.texture.width);
     tmpCanvas.height = Number(this.texture.height);
     tmpCanvas.getContext("2d").drawImage(this.texture, 0, 0);
-    return new Sprite(tmpCanvas);
+    return new Sprite(this.Framework, tmpCanvas);
   }
 
   public cloneImage(): Sprite {
     const tmpImage = document.createElement("img");
     tmpImage.src = this.id;
-    return new Sprite(tmpImage);
+    return new Sprite(this.Framework, tmpImage);
   }
 }
 

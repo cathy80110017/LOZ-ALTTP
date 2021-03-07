@@ -18,15 +18,7 @@ export default class DebugInfo {
   private showDebugInfo: boolean;
   private containerAppended: boolean;
   private debugInfo: HTMLDivElement;
-  private static instance: DebugInfo;
   public Log: Log;
-
-  public static getInstance(): DebugInfo {
-    if (!this.instance) {
-      this.instance = new DebugInfo();
-    }
-    return this.instance;
-  }
 
   public show(dom: HTMLElement): void {
     this.debugInfo.style.visibility = "visible";

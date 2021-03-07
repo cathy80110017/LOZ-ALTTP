@@ -1,8 +1,9 @@
+import Framework from ".";
 import GameObject from "./GameObject";
 
 export default class Scene extends GameObject {
-  constructor() {
-    super();
+  constructor(Framework: Framework) {
+    super(Framework);
     this.texture = undefined;
     this.attachArray = [];
   }
@@ -32,7 +33,7 @@ export default class Scene extends GameObject {
   }
 
   public draw(painter: GameObject | CanvasRenderingContext2D): void {
-    painter = painter || Framework.Game._context;
+    painter = painter || this.Framework.game.context;
     //this.countAbsoluteProperty1();
 
     //if(this.isObjectChanged) {

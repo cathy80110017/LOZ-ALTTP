@@ -1,3 +1,5 @@
+import { key, xy } from "./interface";
+
 export default class Recorder {
   constructor() {
     this.record = [];
@@ -69,7 +71,7 @@ export default class Recorder {
     this.waitCounter++;
   }
 
-  public click(e: MouseEvent): void {
+  public click(e: xy): void {
     this.recordWait();
     this.record.push("Framework.replayer.mouseClick(" + e.x + "," + e.y + ");"); // 2017.04.18 marked
     this.addDivString(
@@ -78,7 +80,7 @@ export default class Recorder {
     this.scrollToBottom();
   }
 
-  public mousedown(e: MouseEvent): void {
+  public mousedown(e: xy): void {
     this.recordWait();
     this.record.push("Framework.replayer.mouseDown(" + e.x + "," + e.y + ");"); // 2017.02.21 added
     this.addDivString(
@@ -87,7 +89,7 @@ export default class Recorder {
     this.scrollToBottom();
   }
 
-  public mouseup(e: MouseEvent): void {
+  public mouseup(e: xy): void {
     this.recordWait();
     this.record.push("Framework.replayer.mouseUp(" + e.x + "," + e.y + ");"); // 2017.02.21 added
     this.addDivString(
@@ -96,7 +98,7 @@ export default class Recorder {
     this.scrollToBottom();
   }
 
-  public mousemove(e: MouseEvent): void {
+  public mousemove(e: xy): void {
     this.recordWait();
     this.record.push("Framework.replayer.mouseMove(" + e.x + "," + e.y + ");");
     this.addDivString(
@@ -106,7 +108,7 @@ export default class Recorder {
   }
 
   //keyboard Event
-  public keydown(e: KeyboardEvent): void {
+  public keydown(e: key): void {
     this.recordWait();
     this.record.push("Framework.replayer.keyDown('" + e.key + "');");
     this.addDivString(
@@ -115,7 +117,7 @@ export default class Recorder {
     this.scrollToBottom();
   }
 
-  public keyup(e: KeyboardEvent): void {
+  public keyup(e: key): void {
     this.recordWait();
     this.record.push("Framework.replayer.keyUp('" + e.key + "');");
     this.addDivString(
@@ -124,7 +126,7 @@ export default class Recorder {
     this.scrollToBottom();
   }
 
-  public keypress(e: KeyboardEvent): void {
+  public keypress(e: key): void {
     this.recordWait();
   }
 

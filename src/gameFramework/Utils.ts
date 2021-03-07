@@ -21,3 +21,15 @@ export function findValueByKey<T extends { name: string }>(
   }
   return null;
 }
+
+export function isAbout(
+  realValue: number,
+  aboutValue: number,
+  delta: number
+): boolean {
+  if (realValue < aboutValue + delta && realValue > aboutValue - delta) {
+    return true;
+  } else {
+    return false;
+  }
+}

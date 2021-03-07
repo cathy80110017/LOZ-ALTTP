@@ -3,15 +3,15 @@ import $ from "jquery";
 import FpsAnalysis from "./FpsAnalysis";
 import Recorder from "./Recorder";
 import Level from "./Level";
-import ResourceManager from "./ResourceManager";
 import Point from "./Point";
 import { findValueByKey } from "./Utils";
-import DebugInfo from "./DebugInfo";
 import GameObject from "./GameObject";
+import Framework from ".";
+import { key, xy, script } from "./interface";
 
 export default class Game {
-  constructor(config: Config, isRecordMode = false, isTestMode = false) {
-    this.config = config;
+  constructor(Framework: Framework, isRecordMode = false, isTestMode = false) {
+    this.config = Framework.config;
     this.fps = this.config.fps;
     this.canvasWidth = this.config.canvasWidth;
     this.canvasHeight = this.config.canvasHeight;
@@ -40,7 +40,7 @@ export default class Game {
     this.ideaWidth = this.config.canvasWidthRatio || 9;
     this.ideaHeight = this.config.canvasHeightRatio || 16;
     this.timelist = [];
-    this.record = new Framework.Recorder();
+    this.record = new Recorder();
     this.tempUpdate = () => {
       return;
     };
@@ -68,20 +68,20 @@ export default class Game {
     this.context = this.canvas.getContext("2d");
     this.mainContainer.appendChild(this.canvas);
   }
-  private config: Config;
+  public config: Config;
   private fps: number;
   private canvasWidth: number;
   private canvasHeight: number;
-  private isBackwardCompatible: boolean;
-  private widthRatio: number;
-  private heightRatio: number;
+  public isBackwardCompatible: boolean;
+  public widthRatio: number;
+  public heightRatio: number;
   private isFullScreen: boolean;
   private isRecording: boolean;
   private isRecordMode: boolean;
   private isTestMode: boolean;
-  private isTestReady: boolean;
-  private isReplay: boolean;
-  private isContinue: boolean;
+  public isTestReady: boolean;
+  public isReplay: boolean;
+  public isContinue: boolean;
   private isInit: boolean;
   private isRunning: boolean;
   private fpsContext: HTMLElement; // ?
@@ -90,8 +90,8 @@ export default class Game {
   private runInstance: number;
   private levels: { name: string; level: Level }[];
   private testScripts: script[];
-  private currentLevel: Level;
-  private context: CanvasRenderingContext2D;
+  public currentLevel: Level;
+  public context: CanvasRenderingContext2D;
   private currentTestScript: any;
   private currentReplay: any;
   private ideaWidth: number;
@@ -101,9 +101,10 @@ export default class Game {
   private tempUpdate: () => void;
   private tempDraw: (ctx: CanvasRenderingContext2D) => void;
   private stopLoop: () => void;
-  private mainContainer: HTMLDivElement;
-  private canvas: HTMLCanvasElement;
+  public mainContainer: HTMLDivElement;
+  public canvas: HTMLCanvasElement;
   private skipTicks: number;
+  private Framework: Framework;
 
   public recordStart(): void {
     if (document.getElementById("start_btn").getAttribute("enable") == "true") {
@@ -194,9 +195,8 @@ export default class Game {
       this.record.isRecording = false; // 為了讓 Record.start() 進入記錄 recordString 的區塊
       this.isContinue = false;
 
-      //TODO: build Replayer
-      Framework.Replayer.resetCycleCount();
-      Framework.Replayer.resetWaitingCounter();
+      this.Framework.replayer.resetCycleCount();
+      this.Framework.replayer.resetWaitingCounter();
       const replayScript = document.getElementById("record_div").innerText;
       document.getElementById("record_div").innerText = "";
 
@@ -225,7 +225,7 @@ export default class Game {
     let end = script.indexOf("}", 0);
     if (end === -1) end = script.length;
     const mainScript = script.substring(start, end).split(";");
-    for (i = 0; i < mainScript.length; i++) {
+    for (let i = 0; i < mainScript.length; i++) {
       mainScript[i] = mainScript[i].replace("\u00a0\u00a0\u00a0\u00a0", "");
       // if(mainScript[i].indexOf("//", 0) === -1){
       // comment 的部分被直接pass掉, 但是仍然會耗一個cycle, asserting 應該也是, 要怎麼補回來?
@@ -331,28 +331,28 @@ export default class Game {
         "../../src/image/letiable_disable.png";
   }
 
-  public click(e: MouseEvent): void {
+  public click(e: xy): void {
     this.currentLevel.click(e);
     if (this.isRecording) {
       this.record.click(e);
     }
   }
 
-  public mousedown(e: MouseEvent): void {
+  public mousedown(e: xy): void {
     this.currentLevel.mousedown(e);
     if (this.isRecording) {
       this.record.mousedown(e);
     }
   }
 
-  public mouseup(e: MouseEvent): void {
+  public mouseup(e: xy): void {
     this.currentLevel.mouseup(e);
     if (this.isRecording) {
       this.record.mouseup(e);
     }
   }
 
-  public mousemove(e: MouseEvent): void {
+  public mousemove(e: xy): void {
     this.currentLevel.mousemove(e);
     if (this.isRecording) {
       this.record.mousemove(e);
@@ -371,21 +371,21 @@ export default class Game {
     this.currentLevel.touchmove(e);
   }
 
-  public keydown(e: KeyboardEvent): void {
+  public keydown(e: key): void {
     this.currentLevel.keydown(e);
     if (this.isRecording) {
       this.record.keydown(e);
     }
   }
 
-  public keyup(e: KeyboardEvent): void {
+  public keyup(e: key): void {
     this.currentLevel.keyup(e);
     if (this.isRecording) {
       this.record.keyup(e);
     }
   }
 
-  public keypress(e: KeyboardEvent): void {
+  public keypress(e: key): void {
     this.currentLevel.keypress(e);
     if (this.isRecording) {
       this.record.keypress(e);
@@ -405,9 +405,9 @@ export default class Game {
 
   public loadingProgress(context: CanvasRenderingContext2D): void {
     this.currentLevel.loadingProgress(context, {
-      request: ResourceManager.getInstance().getRequestCount(),
-      response: ResourceManager.getInstance().getResponseCount(),
-      percent: ResourceManager.getInstance().getFinishedRequestPercent(),
+      request: this.Framework.resourceManager.getRequestCount(),
+      response: this.Framework.resourceManager.getResponseCount(),
+      percent: this.Framework.resourceManager.getFinishedRequestPercent(),
     });
     if (this.isBackwardCompatible) {
       this.initializeProgressResource();
@@ -423,8 +423,7 @@ export default class Game {
     const levelName = this.findLevelNameByLevel(level);
     for (let i = 0, l = this.testScripts.length; i < l; i++) {
       if (this.testScripts[i].targetLevel === levelName) {
-        //TODO: change import
-        Framework.Replayer.ready(this.testScripts[i]);
+        this.Framework.replayer.ready(this.testScripts[i]);
         return;
       }
     }
@@ -527,7 +526,7 @@ export default class Game {
         script: scriptInstance,
       });
     } else {
-      DebugInfo.getInstance().Log.error("Game : Script名稱不能重複");
+      this.Framework.debugInfo.Log.error("Game : Script名稱不能重複");
       throw new Error("Game: already has same script name");
     }
   }
@@ -536,9 +535,9 @@ export default class Game {
     this.pause();
     this.teardown();
     this.currentLevel = this.findLevel(levelName);
-    Framework.Replayer.resetCycleCount(); //TODO: change import
+    this.Framework.replayer.resetCycleCount();
     if (!this.currentLevel) {
-      DebugInfo.getInstance().Log.error("Game : 找不到關卡");
+      this.Framework.debugInfo.Log.error("Game : 找不到關卡");
       throw new Error("Game : levelName not found.");
     }
     if (this.isRecordMode) {
@@ -550,7 +549,7 @@ export default class Game {
   public reLoadLevel(): void {
     this.pause();
     this.teardown();
-    Framework.Replayer.resetCycleCount(); //TODO: change import
+    this.Framework.replayer.resetCycleCount();
     this.start();
   }
 
@@ -558,8 +557,8 @@ export default class Game {
     this.pause();
     this.teardown();
     let flag = false;
-    Framework.Replayer.resetCycleCount(); //TODO: change import
-    Framework.Replayer.resetWaitingCounter(); //TODO: change import
+    this.Framework.replayer.resetCycleCount();
+    this.Framework.replayer.resetWaitingCounter();
     for (const i in this.levels) {
       if (flag) {
         this.currentLevel = this.levels[i].level;
@@ -574,7 +573,7 @@ export default class Game {
         flag = true;
       }
     }
-    DebugInfo.getInstance().Log.error("Game : 無下一關");
+    this.Framework.debugInfo.Log.error("Game : 無下一關");
     throw new Error("Game : can't goto next level.");
   }
 
@@ -583,7 +582,7 @@ export default class Game {
     this.teardown();
     const flag = false;
     let prev = undefined;
-    Framework.Replayer.resetCycleCount(); //TODO: change import
+    this.Framework.replayer.resetCycleCount();
     for (const i in this.levels) {
       if (this.levels[i].level === this.currentLevel) {
         if (!prev) {
@@ -599,7 +598,7 @@ export default class Game {
       }
       prev = this.levels[i].level;
     }
-    DebugInfo.getInstance().Log.error("Game : 無前一關");
+    this.Framework.debugInfo.Log.error("Game : 無前一關");
     throw new Error("Game : can't goto previous level.");
   }
 
@@ -624,13 +623,13 @@ export default class Game {
       this.initialize();
       this.draw = this.currentLevel.draw.bind(this.currentLevel);
       this.update = this.currentLevel.update.bind(this.currentLevel);
-      Framework.Replayer.setGameReady(); //TODO: change import
+      this.Framework.replayer.setGameReady();
       this.run();
     }.bind(this);
     const initFunction = function () {
       if (
-        ResourceManager.getInstance().getRequestCount() !==
-        ResourceManager.getInstance().getResponseCount()
+        this.Framework.resourceManager.getRequestCount() !==
+        this.Framework.resourceManager.getResponseCount()
       ) {
         return;
       }
@@ -643,8 +642,8 @@ export default class Game {
       this.isRunning = false;
       this.load();
       if (
-        ResourceManager.getInstance().getRequestCount() ===
-        ResourceManager.getInstance().getResponseCount()
+        this.Framework.resourceManager.getRequestCount() ===
+        this.Framework.resourceManager.getResponseCount()
       ) {
         runFunction();
       }
@@ -658,22 +657,22 @@ export default class Game {
         runFunction();
       }
     }.bind(this);
-    ResourceManager.getInstance().setSubjectFunction(a);
+    this.Framework.resourceManager.setSubjectFunction(a);
     initFunction();
-    Framework.TouchManager.subject = this.currentLevel;
-    Framework.TouchManager.userTouchstartEvent = this.touchstart;
-    Framework.TouchManager.userTouchendEvent = this.touchend;
-    Framework.TouchManager.userTouchmoveEvent = this.touchmove;
+    this.Framework.touchManager.subject = this.currentLevel;
+    this.Framework.touchManager.userTouchstartEvent = this.touchstart;
+    this.Framework.touchManager.userTouchendEvent = this.touchend;
+    this.Framework.touchManager.userTouchmoveEvent = this.touchmove;
 
-    Framework.MouseManager.userClickEvent = (e) => this.click(e);
-    Framework.MouseManager.userMouseDownEvent = (e) => this.mousedown(e);
-    Framework.MouseManager.userMouseUpEvent = (e) => this.mouseup(e);
-    Framework.MouseManager.userMouseMoveEvent = (e) => this.mousemove(e);
+    this.Framework.mouseManager.userClickEvent = (e) => this.click(e);
+    this.Framework.mouseManager.userMouseDownEvent = (e) => this.mousedown(e);
+    this.Framework.mouseManager.userMouseUpEvent = (e) => this.mouseup(e);
+    this.Framework.mouseManager.userMouseMoveEvent = (e) => this.mousemove(e);
     //Framework.MouseManager.userContextMenuEvent = this.contextmenu;
 
-    Framework.KeyBoardManager.subject = this.currentLevel;
-    Framework.KeyBoardManager.userKeyupEvent = this.keyup;
-    Framework.KeyBoardManager.userKeydownEvent = this.keydown;
+    this.Framework.keyboardManager.subject = this.currentLevel;
+    this.Framework.keyboardManager.userKeyupEvent = this.keyup;
+    this.Framework.keyboardManager.userKeydownEvent = this.keydown;
   }
 
   public run(): void {
@@ -704,7 +703,7 @@ export default class Game {
         if (this.isRecording) {
           if (
             this.isReplay == false ||
-            Framework.Replayer.getWaitingCounter() > 0
+            this.Framework.replayer.getWaitingCounter() > 0
           ) {
             // ok, 但game的cycleCount還是不一致
             this.record.update(); // 哪裡會多做一次呢? 怎麼知道是 game 啟動時第一次的update嗎? 來跳過去?
@@ -713,7 +712,7 @@ export default class Game {
           //console.log("record update")  為了同步 Record的cycleCount?
         }
         if (this.isReplay) {
-          Framework.Replayer.update();
+          this.Framework.replayer.update();
         }
         nextGameTick += this.skipTicks;
       }
@@ -808,7 +807,7 @@ export default class Game {
 
   public setUpdateFPS(fps: number): void {
     if (fps > 60) {
-      Framework.DebugInfo.Log.warring("FPS must be smaller than 60.");
+      this.Framework.debugInfo.Log.warning("FPS must be smaller than 60.");
       throw "FPS must be smaller than 60.";
       fps = 60;
     }
@@ -824,7 +823,7 @@ export default class Game {
 
   public setDrawFPS(fps: number): void {
     if (fps > 60) {
-      Framework.DebugInfo.Log.warring("FPS must be smaller than 60.");
+      this.Framework.debugInfo.Log.warning("FPS must be smaller than 60.");
       throw "FPS must be smaller than 60.";
       fps = 60;
     }
@@ -849,12 +848,12 @@ export default class Game {
   }
 
   public setContext(context: CanvasRenderingContext2D): void {
-    if (!Framework.Util.isUndefined(context)) {
+    if (!context) {
       this.context = null;
       this.canvas = null;
       this.context = context;
     } else {
-      DebugInfo.getInstance().Log.error("Game SetContext Error");
+      this.Framework.debugInfo.Log.error("Game SetContext Error");
     }
   }
 
@@ -905,7 +904,7 @@ export default class Game {
     this.heightRatio = scaledHeight / this.canvas.height;
     this.canvas.style.width = scaledWidth + "px";
     this.canvas.style.height = scaledHeight + "px";
-    Framework.HtmlElementUI.resize(); //TODO
+    // Framework.HtmlElementUI.resize(); //TODO
     // if (this.currentLevel.map) {
     //   this.currentLevel.matter.render.canvas.style.width = scaledWidth + "px";
     //   this.currentLevel.matter.render.canvas.style.height = scaledHeight + "px";
@@ -919,12 +918,6 @@ export default class Game {
   public showAllElement(): void {
     this.currentLevel.showAllElement();
   }
-}
-
-interface script {
-  targetLevel: string;
-  name: string;
-  script: string;
 }
 
 function listMember(main: string, space: string, divId: string) {

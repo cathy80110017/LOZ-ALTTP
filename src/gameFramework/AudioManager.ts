@@ -44,7 +44,7 @@ export default class AudioManager {
     const sourceTagStr = "source";
     const songName = audioArgs.name;
     const song = this.mainPlaylist.get(songName);
-    if (Framework.Util.isUndefined(song)) {
+    if (!song) {
       throw "the playlist is not set or do not contain the song: " + songName;
     }
     const audio = this.getAudioInstance(songName);

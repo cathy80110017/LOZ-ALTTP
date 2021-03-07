@@ -1,28 +1,31 @@
+import Framework from ".";
 import Config from "./Config";
 import GameObject from "./GameObject";
-import ResourceManager from "./ResourceManager";
+import { key, xy } from "./interface";
 import Scene from "./Scene";
 
 export default class Level {
-  constructor() {
-    this.rootScene = new Scene();
+  constructor(Framework: Framework) {
+    this.Framework = Framework;
+    this.rootScene = new Scene(Framework);
     this.autoDelete = true;
     this.firstDraw = true;
     this.allGameElement = [this.rootScene];
     this.timelist = [];
     this.updatetimelist = [];
     this.cycleCount = 0;
-    this.config = Framework.Config;
+    this.config = this.Framework.config;
   }
 
-  private rootScene: Scene;
-  private autoDelete: boolean;
-  private firstDraw: boolean;
+  protected rootScene: Scene;
+  protected autoDelete: boolean;
+  protected firstDraw: boolean;
   public allGameElement: GameObject[];
-  private timelist: any[];
-  private updatetimelist: any[];
-  private cycleCount: number;
-  private config: Config;
+  protected timelist: any[];
+  protected updatetimelist: any[];
+  protected cycleCount: number;
+  protected config: Config;
+  protected Framework: Framework;
 
   public get canvasChanged(): boolean {
     let isCanvasChanged = false;
@@ -34,7 +37,7 @@ export default class Level {
     return isCanvasChanged;
   }
 
-  private traversalAllElement(func: (v: GameObject) => void): void {
+  protected traversalAllElement(func: (v: GameObject) => void): void {
     this.allGameElement.forEach(func);
   }
 
@@ -54,7 +57,7 @@ export default class Level {
   ): void {
     ctx.font = "90px Arial";
     ctx.fillText(
-      Math.floor(ResourceManager.getInstance().getFinishedRequestPercent()) +
+      Math.floor(this.Framework.resourceManager.getFinishedRequestPercent()) +
         "%",
       ctx.canvas.width / 2 - 50,
       ctx.canvas.height / 2
@@ -133,7 +136,7 @@ export default class Level {
   public teardown(): void {
     for (const i in this.allGameElement) {
       const deleteObj = this.allGameElement[i];
-      if (Framework.Util.isFunction(deleteObj.teardown)) {
+      if (deleteObj.teardown instanceof Function) {
         deleteObj.teardown();
       }
       this.allGameElement[i] = null;
@@ -227,7 +230,7 @@ export default class Level {
    * @param {Object} e 事件的參數, 會用到的應該是e.x和e.y兩個參數,
    * 表示的是目前點擊的絕對位置
    */
-  public click(e: MouseEvent): void {
+  public click(e: xy): void {
     return;
   }
 
@@ -237,7 +240,7 @@ export default class Level {
    * @param {Object} e 事件的參數, 會用到的應該是e.x和e.y兩個參數,
    * 表示的是目前點擊的絕對位置
    */
-  public mousedown(e: MouseEvent): void {
+  public mousedown(e: xy): void {
     return;
   }
 
@@ -247,7 +250,7 @@ export default class Level {
    * @param {Object} e 事件的參數, 會用到的應該是e.x和e.y兩個參數,
    * 表示的是目前放開的絕對位置
    */
-  public mouseup(e: MouseEvent): void {
+  public mouseup(e: xy): void {
     return;
   }
 
@@ -257,7 +260,7 @@ export default class Level {
    * @param {Object} e 事件的參數, 會用到的應該是e.x和e.y兩個參數,
    * 表示的是目前滑鼠的絕對位置
    */
-  public mousemove(e: MouseEvent): void {
+  public mousemove(e: xy): void {
     return;
   }
 
@@ -289,15 +292,15 @@ export default class Level {
     return;
   }
 
-  public keydown(e: KeyboardEvent): void {
+  public keydown(e: key): void {
     return;
   }
 
-  public keyup(e: KeyboardEvent): void {
+  public keyup(e: key): void {
     return;
   }
 
-  public keypress(e: KeyboardEvent): void {
+  public keypress(e: key): void {
     return;
   }
 
