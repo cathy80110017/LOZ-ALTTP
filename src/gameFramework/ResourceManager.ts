@@ -35,7 +35,7 @@ export default class ResourceManager {
     imageObj.src = requestOption["url"];
     this._requestCount++;
     if (this._intervalID === null) {
-      this._intervalID = window.setInterval(this.detectAjax, 50);
+      this._intervalID = window.setInterval(() => this.detectAjax(), 50);
       this.finishLoading();
     }
     imageObj.onload = () => {

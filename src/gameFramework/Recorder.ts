@@ -164,7 +164,7 @@ export default class Recorder {
     }
     recordString += "});<br>";
     const form = window.open("record.html", "form2", "_blank", false);
-    setTimeout(function () {
+    setTimeout(() => {
       this.callFunction(form, recordString);
     }, 1000);
 

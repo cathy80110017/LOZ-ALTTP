@@ -21,25 +21,29 @@ export default class MouseManager {
     this.userContextMenuEvent = () => {
       return;
     };
-    this.game.mainContainer.addEventListener("click", this.clickEvent, false);
+    this.game.mainContainer.addEventListener(
+      "click",
+      (e) => this.clickEvent(e),
+      false
+    );
     this.game.mainContainer.addEventListener(
       "mousedown",
-      this.mousedownEvent,
+      (e) => this.mousedownEvent(e),
       false
     );
     this.game.mainContainer.addEventListener(
       "mouseup",
-      this.mouseupEvent,
+      (e) => this.mouseupEvent(e),
       false
     );
     this.game.mainContainer.addEventListener(
       "mousemove",
-      this.mousemoveEvent,
+      (e) => this.mousemoveEvent(e),
       false
     );
     this.game.mainContainer.addEventListener(
       "contextmenu",
-      this.contextmenuEvent,
+      (e) => this.contextmenuEvent(e),
       false
     );
   }

@@ -12,8 +12,8 @@ export default class KeyBoardManager {
     this.userKeyupEvent = () => {
       return;
     };
-    window.addEventListener("keydown", this.keydownEvent, false);
-    window.addEventListener("keyup", this.keyupEvent, false);
+    window.addEventListener("keydown", (e) => this.keydownEvent(e), false);
+    window.addEventListener("keyup", (e) => this.keyupEvent(e), false);
     this.clearHistory();
   }
 
@@ -78,7 +78,7 @@ export default class KeyBoardManager {
     this.keypressHistory.length = 0; //empty array
     clearTimeout(this.timeoutID);
     this.timeoutID = window.setTimeout(
-      this.clearHistory,
+      () => this.clearHistory(),
       this.clearHistoryTime
     );
   }

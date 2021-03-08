@@ -26,10 +26,18 @@ export default class TouchManager {
       this.touchstartEvent,
       false
     );
-    this.game.canvas.addEventListener("touchend", this.touchendEvent, false);
+    this.game.canvas.addEventListener(
+      "touchend",
+      (e) => this.touchendEvent(e),
+      false
+    );
     //Framework.Game.canvas.addEventListener('touchcancel', this.touchcancelEvent, false);
     //Framework.Game.canvas.addEventListener('touchleave', this.touchleaveEvent, false);
-    this.game.canvas.addEventListener("touchmove", this.touchmoveEvent, false);
+    this.game.canvas.addEventListener(
+      "touchmove",
+      (e) => this.touchmoveEvent(e),
+      false
+    );
   }
 
   private game: Game;
