@@ -49,7 +49,6 @@ export default class Sprite extends GameObject {
   }
 
   public draw(painter: CanvasRenderingContext2D | GameObject): void {
-    super.draw(painter);
     this.countAbsoluteProperty();
     if (!this.texture) {
       this.texture = this.Framework.resourceManager.getResource(
@@ -60,7 +59,7 @@ export default class Sprite extends GameObject {
       this.testDraw(painter);
       return;
     }
-    painter = painter || this.Framework.game.context;
+    painter = painter ?? this.Framework.game.context;
     let pos;
     let realWidth;
     let realHeight;
@@ -73,8 +72,13 @@ export default class Sprite extends GameObject {
           !isAbout(this.absoluteScale.y, 1, 0.00001) ||
           !isAbout(this.absoluteRotation, 0, 0.001)
         ) {
-          realWidth = Number(this.texture.width) * this.scale.x;
-          realHeight = Number(this.texture.height) * this.scale.y;
+          if (typeof this.scale === "number") {
+            realWidth = Number(this.texture.width) * this.scale;
+            realHeight = Number(this.texture.height) * this.scale;
+          } else {
+            realWidth = Number(this.texture.width) * this.scale.x;
+            realHeight = Number(this.texture.height) * this.scale.y;
+          }
           // 將canvas 放大才不會被切到
           const diagonalLength = Math.ceil(
             Math.sqrt(Math.pow(realHeight, 2) + Math.pow(realWidth, 2))
@@ -168,8 +172,13 @@ export default class Sprite extends GameObject {
           !isAbout(this.absoluteScale.y, 1, 0.00001) ||
           !isAbout(this.absoluteRotation, 0, 0.001)
         ) {
-          realWidth = Number(this.texture.width) * this.scale.x;
-          realHeight = Number(this.texture.height) * this.scale.y;
+          if (typeof this.scale === "number") {
+            realWidth = Number(this.texture.width) * this.scale;
+            realHeight = Number(this.texture.height) * this.scale;
+          } else {
+            realWidth = Number(this.texture.width) * this.scale.x;
+            realHeight = Number(this.texture.height) * this.scale.y;
+          }
           // 將canvas 放大才不會被切到
           const diagonalLength = Math.floor(
             Math.sqrt(Math.pow(realHeight, 2) + Math.pow(realWidth, 2))

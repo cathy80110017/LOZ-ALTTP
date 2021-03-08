@@ -1,7 +1,7 @@
 import Framework from ".";
 import Config from "./Config";
 import GameObject from "./GameObject";
-import { key, xy } from "./interface";
+import { key, requestInfo, xy } from "./interface";
 import Scene from "./Scene";
 
 export default class Level {
@@ -53,7 +53,7 @@ export default class Level {
 
   public loadingProgress(
     ctx: CanvasRenderingContext2D,
-    requestInfo: { request: number; response: number; percent: number }
+    requestInfo: requestInfo
   ): void {
     ctx.font = "90px Arial";
     ctx.fillText(

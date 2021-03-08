@@ -74,6 +74,8 @@ export default class AnimationSprite extends GameObject {
   private _previousTime = new Date().getTime();
   private _start = false;
   // public
+  public isDrawBoundry: boolean;
+  public isDrawPace: boolean;
   public col = 1;
   public row = 1;
   public from = 0;
@@ -286,8 +288,8 @@ export default class AnimationSprite extends GameObject {
 
     sprite.spriteParent = this.spriteParent;
     sprite.layer = this.layer;
-    // sprite.options.isDrawBoundry = this.isDrawBoundry;
-    // sprite.options.isDrawPace = this.isDrawPace;
+    sprite.options.isDrawBoundry = this.isDrawBoundry;
+    sprite.options.isDrawPace = this.isDrawPace;
     sprite._changeFrame = this._changeFrame;
 
     sprite.draw(painter);
@@ -320,7 +322,7 @@ interface AnimationSpriteOption {
 interface startOption {
   from: number;
   to: number;
-  speed: number;
+  speed?: number;
   loop: boolean;
-  finishPlaying: () => void;
+  finishPlaying?: () => void;
 }

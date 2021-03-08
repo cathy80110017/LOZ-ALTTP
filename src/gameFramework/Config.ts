@@ -4,8 +4,8 @@ export default class Config {
     this.isBackwardCompatible = false;
     this.isOptimize = false; // 2017.02.20, from V3.1.1
     this.isMouseMoveRecorded = false;
-    this.canvasWidth = 1080;
-    this.canvasHeight = 192;
+    this.canvasWidth = 1920;
+    this.canvasHeight = 1080;
   }
 
   public fps: number;

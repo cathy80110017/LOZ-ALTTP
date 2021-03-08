@@ -49,7 +49,7 @@ export default class GameObject {
   public previousWidth: number;
   public previousHeight: number;
   public rotation: number;
-  public scale: xy;
+  public scale: xy | number;
   public position: xy;
   public opacity: number;
   public spriteParent?: GameObject; //TODO: check
@@ -104,14 +104,14 @@ export default class GameObject {
   }
 
   public get width(): number {
-    let height = 0; //this.texture.height;
+    let width = 0; //this.texture.height;
     if (this.texture) {
-      height = Number(this.texture.height);
+      width = Number(this.texture.width);
     }
     /*if (this.row) {
                 height = this.texture.height / this.row;
             }*/
-    return Math.floor(height * this.absoluteScale.y);
+    return Math.floor(width * this.absoluteScale.x);
   }
 
   public get height(): number {
@@ -264,7 +264,13 @@ export default class GameObject {
 
     this.rotation %= 360;
     this.absoluteRotation = this.rotation;
-    this.absoluteScale = this.scale;
+
+    if (typeof this.scale === "number") {
+      this.absoluteScale = { x: this.scale, y: this.scale };
+    } else {
+      this.absoluteScale = this.scale;
+    }
+
     this.absoluteOpacity = this.opacity;
 
     this.absolutePosition.x = this.position.x;

@@ -40,7 +40,7 @@ export default class AudioManager {
     return audioInstance;
   }
 
-  public play(audioArgs: { name: string; loop: boolean }): void {
+  public play(audioArgs: { name: string; loop?: boolean }): void {
     const sourceTagStr = "source";
     const songName = audioArgs.name;
     const song = this.mainPlaylist.get(songName);

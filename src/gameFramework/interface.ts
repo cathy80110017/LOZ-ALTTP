@@ -21,3 +21,9 @@ export interface keydown {
   altKey: boolean;
   lastTimeDiff: number;
 }
+
+export interface requestInfo {
+  request: number;
+  response: number;
+  percent: number;
+}

@@ -11,6 +11,7 @@ import { key, xy, script } from "./interface";
 
 export default class Game {
   constructor(Framework: Framework, isRecordMode = false, isTestMode = false) {
+    this.Framework = Framework;
     this.config = Framework.config;
     this.fps = this.config.fps;
     this.canvasWidth = this.config.canvasWidth;
@@ -433,8 +434,8 @@ export default class Game {
     this.currentLevel.update();
   }
 
-  public draw(): void {
-    this.currentLevel.draw(this.context); // ?
+  public draw(ctx?: CanvasRenderingContext2D): void {
+    this.currentLevel.draw(this.context); //?
   }
 
   public teardown(): void {
@@ -486,7 +487,7 @@ export default class Game {
     }
   }
 
-  public addNewLevel(leveldata: Level[]): void {
+  public addNewLevel(leveldata: { [key: string]: Level }): void {
     for (const i in leveldata) {
       if (leveldata.hasOwnProperty(i)) {
         if (!this.findLevel(i)) {
@@ -614,7 +615,7 @@ export default class Game {
     if (!this.isInit) {
       this.resizeEvent();
       document.body.appendChild(this.mainContainer);
-      window.addEventListener("resize", this.resizeEvent, false);
+      window.addEventListener("resize", () => this.resizeEvent(), false);
     }
     this.initializeProgressResource();
     const runFunction = function () {
@@ -626,7 +627,7 @@ export default class Game {
       this.Framework.replayer.setGameReady();
       this.run();
     }.bind(this);
-    const initFunction = function () {
+    const initFunction = () => {
       if (
         this.Framework.resourceManager.getRequestCount() !==
         this.Framework.resourceManager.getResponseCount()
@@ -647,7 +648,7 @@ export default class Game {
       ) {
         runFunction();
       }
-    }.bind(this);
+    };
     const a = function () {
       if (!this.isInit) {
         initFunction();
@@ -861,7 +862,7 @@ export default class Game {
     return this.context;
   }
 
-  public fullScreen(ele: HTMLElement): void {
+  public fullScreen(ele?: HTMLElement): void {
     ele = ele ?? this.mainContainer;
 
     // current working methods
