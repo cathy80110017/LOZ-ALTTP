@@ -7,10 +7,6 @@ export default class Scene extends GameObject {
     this.attachArray = [];
   }
 
-  public initialize(): void {
-    return;
-  }
-
   public load(): void {
     this.attachArray.forEach(function (ele) {
       ele.load();
@@ -18,17 +14,17 @@ export default class Scene extends GameObject {
   }
 
   public initTexture(): void {
-    this.attachArray.forEach(function (ele) {
+    this.attachArray.forEach((ele) => {
       if (typeof ele.initTexture !== "undefined") {
         ele.initTexture();
       }
-    }, this);
+    });
   }
 
   public update(): void {
-    this.attachArray.forEach(function (ele) {
+    this.attachArray.forEach((ele) => {
       ele.update();
-    }, this);
+    });
   }
 
   public draw(painter?: GameObject | CanvasRenderingContext2D): void {
@@ -37,9 +33,9 @@ export default class Scene extends GameObject {
 
     //if(this.isObjectChanged) {
     //this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.attachArray.forEach(function (ele) {
+    this.attachArray.forEach((ele) => {
       ele.draw(painter);
-    }, this);
+    });
     //}
   }
 
@@ -109,5 +105,10 @@ export default class Scene extends GameObject {
 
   public toString(): string {
     return "[Scene Object]";
+  }
+
+  public afterCreate(): void {
+    super.afterCreate();
+    this.pushSelfToLevel();
   }
 }

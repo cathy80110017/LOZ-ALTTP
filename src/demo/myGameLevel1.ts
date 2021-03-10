@@ -93,7 +93,7 @@ export class myGameLevel1 extends Level {
 
     //繪製Sprite的boundry (Debug用)
     this.firen.sprite.isDrawBoundry = true;
-    this.clock.options.isDrawBoundry = true;
+    this.clock.isDrawBoundry = true;
 
     //載入要被播放的音樂清單
     //資料夾內只提供mp3檔案, 其餘的音樂檔案, 請自行轉檔測試

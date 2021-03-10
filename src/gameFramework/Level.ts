@@ -7,13 +7,15 @@ import Scene from "./Scene";
 export default class Level {
   constructor(Framework: Framework) {
     this.Framework = Framework;
+
     this.rootScene = new Scene(Framework);
     this.autoDelete = true;
     this.firstDraw = true;
-    this.allGameElement = [this.rootScene];
+    this.allGameElement = [];
     this.timelist = [];
     this.updatetimelist = [];
     this.cycleCount = 0;
+
     this.config = this.Framework.config;
   }
 
@@ -46,7 +48,8 @@ export default class Level {
   }
 
   public load(): void {
-    this.traversalAllElement(function (ele) {
+    this.load();
+    this.traversalAllElement((ele) => {
       ele.load();
     });
   }
@@ -55,6 +58,7 @@ export default class Level {
     ctx: CanvasRenderingContext2D,
     requestInfo: requestInfo
   ): void {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.font = "90px Arial";
     ctx.fillText(
       Math.floor(this.Framework.resourceManager.getFinishedRequestPercent()) +
@@ -66,11 +70,8 @@ export default class Level {
 
   public initialize(): void {
     this.cycleCount = 0;
-    this.traversalAllElement(function (ele) {
+    this.traversalAllElement((ele) => {
       ele.initialize();
-      if (ele.initTexture) {
-        ele.initTexture();
-      }
     });
     this.rootScene.initTexture();
   }
@@ -81,8 +82,10 @@ export default class Level {
       ele.clearDirtyFlag();
     });
     const preDraw = Date.now();
+
     this.rootScene.update();
     this.cycleCount++;
+
     const drawTime = Date.now() - preDraw;
     this.updatetimelist.push(drawTime);
     if (this.updatetimelist.length >= 30) {
@@ -92,28 +95,35 @@ export default class Level {
     }
   }
 
-  public draw(ctx: CanvasRenderingContext2D): void {
+  public draw(ctx?: CanvasRenderingContext2D): void {
     this.rootScene.countAbsoluteProperty();
     /*this.traversalAllElement(function(ele) {
             ele.countAbsoluteProperty();
         })*/
     if (this.canvasChanged) {
       const rect = this.getChangedRect(ctx.canvas.width, ctx.canvas.height);
+
       ctx.save();
       ctx.beginPath();
+
       if (!this.config.isOptimize || this.firstDraw) {
         // 2017.02.20, from V3.1.1
         rect.x = 0;
         rect.y = 0;
-        rect.width = Number(ctx.canvas.width);
+        rect.width = ctx.canvas.width;
         rect.height = ctx.canvas.height;
         this.firstDraw = false;
       }
+
       ctx.rect(rect.x, rect.y, rect.width, rect.height);
       ctx.clip();
+
       ctx.clearRect(rect.x, rect.y, rect.width, rect.height);
+
       const preDraw = Date.now();
+
       this.rootScene.draw(ctx);
+
       const drawTime = Date.now() - preDraw;
       this.timelist.push(drawTime);
       if (this.timelist.length >= 30) {
@@ -318,6 +328,10 @@ export default class Level {
     }
     this.rootScene.attachArray.length = 0;
     this.teardown();
+  }
+
+  public afterLevelLoad(): void {
+    this.rootScene.afterCreate();
   }
 }
 

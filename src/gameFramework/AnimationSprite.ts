@@ -38,7 +38,7 @@ export default class AnimationSprite extends GameObject {
       );
       throw new SyntaxError("AnimationSprite constructor arguments error");
     }
-    this.speed = options.speed || 24;
+    this.speed = options.speed ?? 24;
     this.loop = options?.loop ?? true;
 
     if (typeof options.url === "string") {
@@ -53,15 +53,16 @@ export default class AnimationSprite extends GameObject {
       this._id = [];
       this._type = "more";
       this._id = options.url;
-      options.url.forEach(function (src: string) {
+      options.url.forEach((src: string) => {
         this._sprites.push(new Sprite(this.Framework, src));
-      }, this);
+      });
       this._isLoadSprite = true;
     } else if (options) {
       this.Framework.debugInfo.Log.error(
         "AnimationSprite 不支援的參數 " + options
       );
     }
+
     this.pushSelfToLevel();
   }
 
@@ -90,7 +91,6 @@ export default class AnimationSprite extends GameObject {
   public finishPlaying = function (): void {
     return;
   };
-  public texture: CanvasImageSource;
 
   public set index(v: number) {
     this._index = v;
@@ -132,7 +132,7 @@ export default class AnimationSprite extends GameObject {
     }
   }
 
-  initTexture(): void {
+  public initTexture(): void {
     return;
   }
 
@@ -151,7 +151,7 @@ export default class AnimationSprite extends GameObject {
    *         console.log('finish');
    *     }});
    */
-  start(option?: startOption): void {
+  public start(option?: startOption): void {
     this.from = option?.from ?? 0;
     this.to = option?.to ?? this.maxIndex;
     this.speed = option?.speed ?? this.speed;
@@ -231,19 +231,20 @@ export default class AnimationSprite extends GameObject {
         this._sprites.reverse();
       }
     } else {
-      this._id.forEach(function (imgId) {
+      this._id.forEach((imgId) => {
         const tmpCanvas = document.createElement("canvas");
         const tmpImg = this.Framework.resourceManager.getResource(
           imgId
         ) as CanvasImageSource;
-        const realWidth = Number(tmpImg.width) * this.scale.x;
-        const realHeight = Number(tmpImg.height) * this.scale.y;
+        const realWidth = Number(tmpImg.width) * this.scale;
+        const realHeight = Number(tmpImg.height) * this.scale;
         tmpCanvas.width = realWidth;
         tmpCanvas.height = realHeight;
         const tmpContext = tmpCanvas.getContext("2d");
         tmpContext.drawImage(tmpImg, 0, 0);
         this._sprites.push(new Sprite(this.Framework, tmpCanvas));
-      }, this);
+        this.texture = this._sprites[this.index];
+      });
     }
 
     //}).call(this);
@@ -264,36 +265,27 @@ export default class AnimationSprite extends GameObject {
   }
 
   public draw(painter: GameObject | CanvasRenderingContext2D): void {
-    painter = painter || this.Framework.game.context;
+    painter = painter ?? this.Framework.game.context;
     if (!this._sprites || this._sprites.length == 0) {
       this.initialize();
     }
-    //if(this.isObjectChanged) {
-    const sprite = this._sprites[this.index];
 
-    //if(this._isMove) {
-    sprite.position = this.position;
-    sprite.absolutePosition = this.absolutePosition;
-    //}
+    this.texture = this._sprites[this.index];
+    this.texture.position = this.position;
+    this.texture.absolutePosition = this.absolutePosition;
+    this.texture.rotation = this.rotation;
+    this.texture.absoluteRotation = this.absoluteRotation;
 
-    //if(this._isRotate) {
-    sprite.rotation = this.rotation;
-    sprite.absoluteRotation = this.absoluteRotation;
-    //}
+    this.texture.scale = this.scale;
+    this.texture.absoluteScale = this.absoluteScale;
 
-    //if(this._isScale) {
-    sprite.scale = this.scale;
-    sprite.absoluteScale = this.absoluteScale;
-    //}
+    this.texture.spriteParent = this.spriteParent;
+    this.texture.layer = this.layer;
+    this.texture.isDrawBoundry = this.isDrawBoundry;
+    this.texture.isDrawPace = this.isDrawPace;
+    this.texture._changeFrame = this._changeFrame;
 
-    sprite.spriteParent = this.spriteParent;
-    sprite.layer = this.layer;
-    sprite.options.isDrawBoundry = this.isDrawBoundry;
-    sprite.options.isDrawPace = this.isDrawPace;
-    sprite._changeFrame = this._changeFrame;
-
-    sprite.draw(painter);
-    //}
+    this.texture.draw(painter);
   }
 
   public toString(): string {
@@ -304,9 +296,9 @@ export default class AnimationSprite extends GameObject {
     if (typeof this._id === "string") {
       this.Framework.resourceManager.destroyResource(this._id);
     } else if (this._type === "more") {
-      this._sprites.forEach(function (s) {
+      this._sprites.forEach((s) => {
         s.teardown();
-      }, this);
+      });
     }
   }
 }

@@ -4,14 +4,19 @@
 import Framework from ".";
 import { xy } from "./interface";
 import Point from "./Point";
+import Sprite from "./Sprite";
 
 export default class GameObject {
   constructor(Framework: Framework) {
     this.Framework = Framework;
+
+    this.relativePosition = new Point();
+    this.relativeRotation = 0;
+    this.relativeScale = 1;
+
     this.absolutePosition = { x: 0, y: 0 };
     this.absoluteRotation = 0;
-    this.absoluteScale = { x: 1, y: 1 };
-    this.absoluteOpacity = 1;
+    this.absoluteScale = 1;
     this.systemLayer = 1;
     //this.spriteParent = {}
     this.previousAbsolutePosition = new Point();
@@ -19,39 +24,35 @@ export default class GameObject {
     this.previousHeight = 0;
 
     this.rotation = 0;
-    this.scale = { x: 1, y: 1 };
+    this.scale = 1;
     this.position = { x: 0, y: 0 };
-    this.opacity = 1;
 
     this._isRotate = true;
     this._isScale = true;
     this._isMove = true;
-    this._isFade = true;
     this._changeFrame = true;
     this._isCountAbsolute = false;
   }
 
+  private relativePosition: Point;
+  private relativeRotation: number;
+  private relativeScale: number;
+
   public _isRotate: boolean;
   public _isScale: boolean;
   public _isMove: boolean;
-  private _isFade: boolean;
   public _changeFrame: boolean;
   private _isCountAbsolute: boolean;
   private _selfCanvas: HTMLCanvasElement;
-  public texture: CanvasImageSource;
+  public texture: CanvasImageSource | Sprite;
   public attachArray: GameObject[];
   public absolutePosition: xy;
   public absoluteRotation: number;
-  public absoluteScale: xy;
-  public absoluteOpacity: number;
+  public absoluteScale: number;
   public systemLayer: number;
   public previousAbsolutePosition: Point;
   public previousWidth: number;
   public previousHeight: number;
-  public rotation: number;
-  public scale: xy | number;
-  public position: xy;
-  public opacity: number;
   public spriteParent?: GameObject; //TODO: check
   protected Framework: Framework;
 
@@ -62,7 +63,7 @@ export default class GameObject {
               }*/
 
     if (this.attachArray) {
-      this.attachArray.forEach(function (ele) {
+      this.attachArray.forEach((ele) => {
         if (ele.isObjectChanged) {
           isParentChanged = true;
         }
@@ -71,7 +72,6 @@ export default class GameObject {
     return (
       this._isRotate ||
       this._isScale ||
-      this._isFade ||
       this._isMove ||
       this._changeFrame ||
       isParentChanged
@@ -103,6 +103,37 @@ export default class GameObject {
     return false;
   }
 
+  public set position(newValue: xy) {
+    if (newValue.x) {
+      this.relativePosition.x = Math.floor(newValue.x);
+      //this._isMove = true;
+    }
+
+    if (newValue.y) {
+      this.relativePosition.y = Math.floor(newValue.y);
+      //this._isMove = true;
+    }
+  }
+
+  public get position(): xy {
+    return this.relativePosition;
+  }
+
+  public set rotation(v: number) {
+    this.relativeRotation = v;
+  }
+
+  public get rotation(): number {
+    return this.relativeRotation;
+  }
+
+  public set scale(v: number) {
+    this.relativeScale = v;
+  }
+  public get scale(): number {
+    return this.relativeScale;
+  }
+
   public get width(): number {
     let width = 0; //this.texture.height;
     if (this.texture) {
@@ -111,7 +142,7 @@ export default class GameObject {
     /*if (this.row) {
                 height = this.texture.height / this.row;
             }*/
-    return Math.floor(width * this.absoluteScale.x);
+    return Math.floor(width * this.absoluteScale);
   }
 
   public get height(): number {
@@ -122,7 +153,7 @@ export default class GameObject {
     /*if (this.row) {
                     height = this.texture.height / this.row;
                 }*/
-    return Math.floor(height * this.absoluteScale.y);
+    return Math.floor(height * this.absoluteScale);
   }
 
   public get diagonal(): number {
@@ -130,12 +161,12 @@ export default class GameObject {
   }
 
   public get upperLeft(): xy {
-    const oriX = -this.width / 2,
-      oriY = -this.height / 2,
-      positionDif = this.countRotatePoint(
-        { x: oriX, y: oriY },
-        this.absoluteRotation
-      );
+    const oriX = -this.width / 2;
+    const oriY = -this.height / 2;
+    const positionDif = this.countRotatePoint(
+      { x: oriX, y: oriY },
+      this.absoluteRotation
+    );
 
     return {
       x: Math.floor(this.absolutePosition.x + positionDif.x),
@@ -144,12 +175,12 @@ export default class GameObject {
   }
 
   public get upperRight(): xy {
-    const oriX = this.width / 2,
-      oriY = -this.height / 2,
-      positionDif = this.countRotatePoint(
-        { x: oriX, y: oriY },
-        this.absoluteRotation
-      );
+    const oriX = this.width / 2;
+    const oriY = -this.height / 2;
+    const positionDif = this.countRotatePoint(
+      { x: oriX, y: oriY },
+      this.absoluteRotation
+    );
 
     return {
       x: Math.floor(this.absolutePosition.x + positionDif.x),
@@ -158,12 +189,12 @@ export default class GameObject {
   }
 
   public get lowerLeft(): xy {
-    const oriX = -this.width / 2,
-      oriY = this.height / 2,
-      positionDif = this.countRotatePoint(
-        { x: oriX, y: oriY },
-        this.absoluteRotation
-      );
+    const oriX = -this.width / 2;
+    const oriY = this.height / 2;
+    const positionDif = this.countRotatePoint(
+      { x: oriX, y: oriY },
+      this.absoluteRotation
+    );
 
     return {
       x: Math.floor(this.absolutePosition.x + positionDif.x),
@@ -172,12 +203,12 @@ export default class GameObject {
   }
 
   public get lowerRight(): xy {
-    const oriX = this.width / 2,
-      oriY = this.height / 2,
-      positionDif = this.countRotatePoint(
-        { x: oriX, y: oriY },
-        this.absoluteRotation
-      );
+    const oriX = this.width / 2;
+    const oriY = this.height / 2;
+    const positionDif = this.countRotatePoint(
+      { x: oriX, y: oriY },
+      this.absoluteRotation
+    );
 
     return {
       x: Math.floor(this.absolutePosition.x + positionDif.x),
@@ -205,13 +236,12 @@ export default class GameObject {
     }
 
     this._selfCanvas = document.createElement("canvas");
-    // const diagonalLength = Math.ceil(
-    //   Math.sqrt(Math.pow(this.height, 2) + Math.pow(this.width, 2))
-    // );
-    // this._selfCanvas.width = diagonalLength;
-    // this._selfCanvas.height = diagonalLength;
-    this._selfCanvas.width = this.width;
-    this._selfCanvas.height = this.height;
+    const diagonalLength = Math.ceil(
+      Math.sqrt(Math.pow(this.height, 2) + Math.pow(this.width, 2))
+    );
+    this._selfCanvas.width = diagonalLength;
+    this._selfCanvas.height = diagonalLength;
+
     if (this.width === 0 && this.height === 0) {
       /*this._selfCanvas = Framework.Game._canvas;
                 return this._selfCanvas;*/
@@ -229,7 +259,6 @@ export default class GameObject {
     this._isRotate = false;
     this._isScale = false;
     this._isMove = false;
-    this._isFade = false;
     this._changeFrame = false;
   }
 
@@ -238,46 +267,64 @@ export default class GameObject {
   }
 
   public countAbsoluteProperty(): void {
+    let parentRotation = 0,
+      parentScale = 1,
+      parentPositionX = 0,
+      parentPositionY = 0;
+
     this.previousAbsolutePosition.x = this.absolutePosition.x;
     this.previousAbsolutePosition.y = this.absolutePosition.y;
     this.previousWidth = this.width;
     this.previousHeight = this.height;
 
-    if (this.absoluteRotation !== this.rotation) {
+    if (this.spriteParent) {
+      parentRotation = this.spriteParent.absoluteRotation;
+      parentScale = this.spriteParent.absoluteScale;
+      parentPositionX = this.spriteParent.absolutePosition.x;
+      parentPositionY = this.spriteParent.absolutePosition.y;
+    }
+
+    const rad = (parentRotation / 180) * Math.PI;
+
+    const changedRotate = this.rotation + parentRotation;
+    const changedScale = this.scale * parentScale;
+    const changedPositionX =
+      Math.floor(
+        this.relativePosition.x * Math.cos(rad) -
+          this.relativePosition.y * Math.sin(rad)
+      ) *
+        parentScale +
+      parentPositionX;
+    const changedPositionY =
+      Math.floor(
+        this.relativePosition.x * Math.sin(rad) +
+          this.relativePosition.y * Math.cos(rad)
+      ) *
+        parentScale +
+      parentPositionY;
+
+    if (this.absoluteRotation !== changedRotate) {
       this._isRotate = true;
     }
 
-    if (this.absoluteScale !== this.scale) {
+    if (this.absoluteScale !== changedScale) {
       this._isScale = true;
     }
 
     if (
-      this.absolutePosition.x !== this.position.x ||
-      this.absolutePosition.y !== this.position.y
+      this.absolutePosition.x !== changedPositionX ||
+      this.absolutePosition.y !== changedPositionY
     ) {
       this._isMove = true;
     }
 
-    if (this.absoluteOpacity !== this.opacity) {
-      this._isFade = true;
-    }
-
-    this.rotation %= 360;
-    this.absoluteRotation = this.rotation;
-
-    if (typeof this.scale === "number") {
-      this.absoluteScale = { x: this.scale, y: this.scale };
-    } else {
-      this.absoluteScale = this.scale;
-    }
-
-    this.absoluteOpacity = this.opacity;
-
-    this.absolutePosition.x = this.position.x;
-    this.absolutePosition.y = this.position.y;
+    this.absoluteRotation = changedRotate;
+    this.absoluteScale = changedScale;
+    this.absolutePosition.x = changedPositionX;
+    this.absolutePosition.y = changedPositionY;
 
     if (Array.isArray(this.attachArray)) {
-      this.attachArray.forEach(function (ele) {
+      this.attachArray.forEach((ele) => {
         if (ele.countAbsoluteProperty) {
           ele.countAbsoluteProperty();
         }
@@ -315,6 +362,10 @@ export default class GameObject {
   }
 
   public initTexture(): void {
+    return;
+  }
+
+  public afterCreate(): void {
     return;
   }
 }

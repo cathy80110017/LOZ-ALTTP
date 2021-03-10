@@ -38,8 +38,8 @@ export default class Game {
     this.context = null;
     this.currentTestScript = undefined;
     this.currentReplay = undefined;
-    this.ideaWidth = this.config.canvasWidthRatio || 9;
-    this.ideaHeight = this.config.canvasHeightRatio || 16;
+    this.ideaWidth = this.config.canvasWidthRatio || 16;
+    this.ideaHeight = this.config.canvasHeightRatio || 9;
     this.timelist = [];
     this.record = new Recorder();
     this.tempUpdate = () => {
@@ -48,26 +48,41 @@ export default class Game {
     this.tempDraw = () => {
       return;
     };
-    this.stopLoop = this.stopAnimationFrame;
     //this.stopLoop = this.stopInterval
 
     this.mainContainer = document.createElement("div");
-    this.mainContainer.setAttribute("id", "main-container");
-    $(this.mainContainer).css({
-      backgroundColor: "#000000",
-      width: "100%",
-      height: "100%",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-    });
+    if (this.isRecordMode) {
+      this.mainContainer.style.position = "relative";
+      this.mainContainer.style.float = "left";
+      this.mainContainer.style.width = "70%";
+      this.mainContainer.style.height = "100%";
+      this.mainContainer.style.display = "table";
+    } else if (this.isTestMode) {
+      this.mainContainer.style.position = "relative";
+      this.mainContainer.style.float = "left";
+      this.mainContainer.style.width = "70%";
+      this.mainContainer.style.height = "100%";
+    } else {
+      this.mainContainer.style.width = "100%";
+      this.mainContainer.style.height = "100%";
+      this.mainContainer.style.display = "table";
+    }
+
+    this.mainContainer.style.backgroundColor = "#000";
+    this.canvasContainer = document.createElement("div");
+    this.canvasContainer.style.display = "table-cell";
+    this.canvasContainer.style.textAlign = "center";
+    this.canvasContainer.style.verticalAlign = "middle";
     this.canvas = document.createElement("canvas");
-    this.canvas.setAttribute("id", "game-canvas");
-    this.canvas.width = this.canvasWidth;
-    this.canvas.height = this.canvasHeight;
-    $(this.canvas).css({ backgroundColor: "#000000" });
+    this.canvas.style.backgroundColor = "#fff";
+    this.canvas.setAttribute("id", "__game_canvas__");
+    this.canvas.width = this.config.canvasWidth;
+    this.canvas.height = this.config.canvasHeight;
+    this.canvasContainer.appendChild(this.canvas);
+    this.mainContainer.appendChild(this.canvasContainer);
     this.context = this.canvas.getContext("2d");
-    this.mainContainer.appendChild(this.canvas);
+
+    this.stopLoop = this.stopAnimationFrame;
   }
   public config: Config;
   private fps: number;
@@ -103,6 +118,7 @@ export default class Game {
   private tempDraw: (ctx: CanvasRenderingContext2D) => void;
   private stopLoop: () => void;
   public mainContainer: HTMLDivElement;
+  public canvasContainer: HTMLDivElement;
   public canvas: HTMLCanvasElement;
   private skipTicks: number;
   private Framework: Framework;
@@ -237,7 +253,7 @@ export default class Game {
     }
   }
 
-  public showletiable(): void {
+  public showVariable(): void {
     const maindiv = document.getElementById("main");
     if (
       document.getElementById("letiable_list") == null &&
@@ -260,76 +276,78 @@ export default class Game {
   public btnMouseOver(button: HTMLImageElement): void {
     if (button.getAttribute("enable") === "true") {
       if (button.id == "start_btn")
-        button.src = "../../src/image/play_over.png";
+        button.src = "/assets/demo/image/play_over.png";
       if (button.id == "pause_btn")
-        button.src = "../../src/image/pause_over.png";
-      if (button.id == "stop_btn") button.src = "../../src/image/stop_over.png";
+        button.src = "/assets/demo/image/pause_over.png";
+      if (button.id == "stop_btn")
+        button.src = "/assets/demo/image/stop_over.png";
       if (button.id == "type_btn")
-        button.src = "../../src/image/addComment_over.png";
+        button.src = "/assets/demo/image/addComment_over.png";
       if (button.id == "replay_btn")
-        button.src = "../../src/image/replay_over.png";
+        button.src = "/assets/demo/image/replay_over.png";
       if (button.id == "letiable_btn")
-        button.src = "../../src/image/letiable_over.png";
+        button.src = "/assets/demo/image/letiable_over.png";
     }
   }
 
   public btnMouseOut(button: HTMLImageElement): void {
     if (button.getAttribute("enable") === "true") {
-      if (button.id == "start_btn") button.src = "../../src/image/play.png";
-      if (button.id == "pause_btn") button.src = "../../src/image/pause.png";
-      if (button.id == "stop_btn") button.src = "../../src/image/stop.png";
+      if (button.id == "start_btn") button.src = "/assets/demo/image/play.png";
+      if (button.id == "pause_btn") button.src = "/assets/demo/image/pause.png";
+      if (button.id == "stop_btn") button.src = "/assets/demo/image/stop.png";
       if (button.id == "type_btn")
-        button.src = "../../src/image/addComment.png";
-      if (button.id == "replay_btn") button.src = "../../src/image/replay.png";
+        button.src = "/assets/demo/image/addComment.png";
+      if (button.id == "replay_btn")
+        button.src = "/assets/demo/image/replay.png";
       if (button.id == "letiable_btn")
-        button.src = "../../src/image/letiable.png";
+        button.src = "/assets/demo/image/letiable.png";
     }
   }
 
   public btnEnable(): void {
     if (document.getElementById("start_btn").getAttribute("enable") === "true")
       (document.getElementById("start_btn") as HTMLImageElement).src =
-        "../../src/image/play.png";
+        "/assets/demo/image/play.png";
     else
       (document.getElementById("start_btn") as HTMLImageElement).src =
-        "../../src/image/play_disable.png";
+        "/assets/demo/image/play_disable.png";
 
     if (document.getElementById("pause_btn").getAttribute("enable") === "true")
       (document.getElementById("pause_btn") as HTMLImageElement).src =
-        "../../src/image/pause.png";
+        "/assets/demo/image/pause.png";
     else
       (document.getElementById("pause_btn") as HTMLImageElement).src =
-        "../../src/image/pause_disable.png";
+        "/assets/demo/image/pause_disable.png";
 
     if (document.getElementById("stop_btn").getAttribute("enable") === "true")
       (document.getElementById("stop_btn") as HTMLImageElement).src =
-        "../../src/image/stop.png";
+        "/assets/demo/image/stop.png";
     else
       (document.getElementById("stop_btn") as HTMLImageElement).src =
-        "../../src/image/stop_disable.png";
+        "/assets/demo/image/stop_disable.png";
 
     if (document.getElementById("type_btn").getAttribute("enable") === "true")
       (document.getElementById("type_btn") as HTMLImageElement).src =
-        "../../src/image/addComment.png";
+        "/assets/demo/image/addComment.png";
     else
       (document.getElementById("type_btn") as HTMLImageElement).src =
-        "../../src/image/addComment_disable.png";
+        "/assets/demo/image/addComment_disable.png";
 
     if (document.getElementById("replay_btn").getAttribute("enable") === "true")
       (document.getElementById("replay_btn") as HTMLImageElement).src =
-        "../../src/image/replay.png";
+        "/assets/demo/image/replay.png";
     else
       (document.getElementById("replay_btn") as HTMLImageElement).src =
-        "../../src/image/replay_disable.png";
+        "/assets/demo/image/replay_disable.png";
 
     if (
       document.getElementById("letiable_btn").getAttribute("enable") === "true"
     )
       (document.getElementById("letiable_btn") as HTMLImageElement).src =
-        "../../src/image/letiable.png";
+        "/assets/demo/image/letiable.png";
     else
       (document.getElementById("letiable_btn") as HTMLImageElement).src =
-        "../../src/image/letiable_disable.png";
+        "/assets/demo/image/letiable_disable.png";
   }
 
   public click(e: xy): void {
@@ -435,7 +453,7 @@ export default class Game {
   }
 
   public draw(ctx?: CanvasRenderingContext2D): void {
-    this.currentLevel.draw(this.context); //?
+    this.currentLevel.draw(); //?
   }
 
   public teardown(): void {
@@ -448,9 +466,9 @@ export default class Game {
     this.teardown();
   }
 
-  public getCanvasTopLeft(): Point {
-    return new Point(this.canvas.offsetLeft, this.canvas.offsetTop);
-  }
+  // public getCanvasTopLeft(): Point {
+  //   return new Point(this.canvas.offsetLeft, this.canvas.offsetTop);
+  // }
 
   public getCanvasWidth(): number {
     return this.canvas.width;
@@ -492,25 +510,25 @@ export default class Game {
       if (leveldata.hasOwnProperty(i)) {
         if (!this.findLevel(i)) {
           this.levels.push({ name: i, level: leveldata[i] });
+          leveldata[i].afterLevelLoad();
         } else {
-          /*Framework.DebugInfo.Log.error('Game : 關卡名稱不能重複')
-                    throw new Error('Game: already has same level name')*/
-          this.changeLevelData(i, leveldata[i]);
+          this.Framework.debugInfo.Log.error("Game : 關卡名稱不能重複");
+          throw new Error("Game: already has same level name");
         }
       }
     }
   }
 
-  public changeLevelData(levelName: string, levelObj: Level): void {
-    let toChange: number;
-    this.levels.forEach((level, index) => {
-      if (level.name === levelName) {
-        toChange = index;
-      }
-    });
-    delete this.levels[toChange];
-    this.levels[toChange] = { name: levelName, level: levelObj };
-  }
+  // public changeLevelData(levelName: string, levelObj: Level): void {
+  //   let toChange: number;
+  //   this.levels.forEach((level, index) => {
+  //     if (level.name === levelName) {
+  //       toChange = index;
+  //     }
+  //   });
+  //   delete this.levels[toChange];
+  //   this.levels[toChange] = { name: levelName, level: levelObj };
+  // }
 
   public addNewTestScript(
     levelName: string,
@@ -547,12 +565,12 @@ export default class Game {
     this.start();
   }
 
-  public reLoadLevel(): void {
-    this.pause();
-    this.teardown();
-    this.Framework.replayer.resetCycleCount();
-    this.start();
-  }
+  // public reLoadLevel(): void {
+  //   this.pause();
+  //   this.teardown();
+  //   this.Framework.replayer.resetCycleCount();
+  //   this.start();
+  // }
 
   public goToNextLevel(): void {
     this.pause();
@@ -618,7 +636,8 @@ export default class Game {
       window.addEventListener("resize", () => this.resizeEvent(), false);
     }
     this.initializeProgressResource();
-    const runFunction = function () {
+
+    const runFunction = () => {
       this.isRunning = true;
       this.pause();
       this.initialize();
@@ -626,7 +645,7 @@ export default class Game {
       this.update = this.currentLevel.update.bind(this.currentLevel);
       this.Framework.replayer.setGameReady();
       this.run();
-    }.bind(this);
+    };
     const initFunction = () => {
       if (
         this.Framework.resourceManager.getRequestCount() !==
@@ -649,7 +668,8 @@ export default class Game {
         runFunction();
       }
     };
-    const a = function () {
+
+    this.Framework.resourceManager.setSubjectFunction(() => {
       if (!this.isInit) {
         initFunction();
         return;
@@ -657,9 +677,10 @@ export default class Game {
       if (!this.isRunning) {
         runFunction();
       }
-    }.bind(this);
-    this.Framework.resourceManager.setSubjectFunction(a);
+    });
+
     initFunction();
+
     this.Framework.touchManager.subject = this.currentLevel;
     this.Framework.touchManager.userTouchstartEvent = this.touchstart;
     this.Framework.touchManager.userTouchendEvent = this.touchend;
@@ -685,10 +706,12 @@ export default class Game {
     const previousUpdateTime = nowFunc();
     const previousDrawTime = previousUpdateTime;
     let now = previousDrawTime;
+
     let nextGameTick = now;
     let nextGameDrawTick = now;
     this.skipTicks = Math.round(1000 / this.fps);
-    const updateFunc = function () {
+
+    const updateFunc = () => {
       now = nowFunc();
       if (now > nextGameTick) {
         this.fpsAnalysis.update();
@@ -717,8 +740,9 @@ export default class Game {
         }
         nextGameTick += this.skipTicks;
       }
-    }.bind(this);
-    const drawFunc = function () {
+    };
+
+    const drawFunc = () => {
       if (now >= nextGameDrawTick) {
         this.draw(this.context);
         this.drawfpsAnalysis.update();
@@ -731,8 +755,8 @@ export default class Game {
         }
         nextGameDrawTick += this.skipTicks;
       }
-    }.bind(this);
-    const gameLoopFunc = function () {
+    };
+    const gameLoopFunc = () => {
       /*let currentUpdate = Date.now()
             if(this.lastUpdate) {
                 console.log(currentUpdate - this.lastUpdate + ' ms')
@@ -750,7 +774,8 @@ export default class Game {
         const average = this.countAverage(this.timelist);
         this.timelist = [];
       }
-    }.bind(this);
+    };
+
     this.isRunning = true;
     this.runAnimationFrame(gameLoopFunc);
     //this.runInterval(gameLoopFunc)
@@ -775,12 +800,12 @@ export default class Game {
   public runAnimationFrame(gameLoopFunc: () => void): void {
     window.requestAnimationFrame =
       window.requestAnimationFrame || window.webkitRequestAnimationFrame;
-    const _run = function () {
+    const _run = () => {
       gameLoopFunc();
       if (this.isRunning) {
         this.runInstance = requestAnimationFrame(_run);
       }
-    }.bind(this);
+    };
     _run();
     this.stopLoop = this.stopAnimationFrame;
   }
@@ -842,8 +867,8 @@ export default class Game {
       this.canvas = null;
       this.context = null;
       this.canvas = canvas;
-      this.mainContainer.innerHTML = "";
-      this.mainContainer.appendChild(this.canvas);
+      this.canvasContainer.innerHTML = "";
+      this.canvasContainer.appendChild(this.canvas);
       this.context = this.canvas.getContext("2d");
     }
   }
@@ -863,7 +888,7 @@ export default class Game {
   }
 
   public fullScreen(ele?: HTMLElement): void {
-    ele = ele ?? this.mainContainer;
+    ele = ele ?? this.canvas;
 
     // current working methods
     if (ele.requestFullscreen) {
@@ -899,8 +924,8 @@ export default class Game {
       base = baseHeight;
     }
 
-    scaledWidth = base * this.ideaWidth;
-    scaledHeight = base * this.ideaHeight;
+    scaledWidth = Math.round(base * this.ideaWidth);
+    scaledHeight = Math.round(base * this.ideaHeight);
     this.widthRatio = scaledWidth / this.canvas.width;
     this.heightRatio = scaledHeight / this.canvas.height;
     this.canvas.style.width = scaledWidth + "px";
@@ -913,6 +938,9 @@ export default class Game {
   }
 
   public pushGameObj(ele: GameObject): void {
+    if (!this.currentLevel) {
+      this.currentLevel = this.levels[0].level;
+    }
     this.currentLevel.allGameElement.push(ele);
   }
 
@@ -925,14 +953,14 @@ function listMember(main: string, space: string, divId: string) {
   if (document.getElementById(divId + "_check")) {
     if (
       (document.getElementById(divId + "_check") as HTMLImageElement).src.match(
-        "../../src/image/arrow_over.png"
+        "/assets/demo/image/arrow_over.png"
       )
     ) {
       (document.getElementById(divId + "_check") as HTMLImageElement).src =
-        "../../src/image/arrow.png";
+        "/assets/demo/image/arrow.png";
     } else {
       (document.getElementById(divId + "_check") as HTMLImageElement).src =
-        "../../src/image/arrow_over.png";
+        "/assets/demo/image/arrow_over.png";
     }
   }
   const div = document.getElementById(divId);
@@ -960,7 +988,7 @@ function listMember(main: string, space: string, divId: string) {
             varDiv.id = key;
             varDiv.setAttribute("vertical-align", "baseline");
             const checkBox = document.createElement("img");
-            checkBox.setAttribute("src", "../../src/image/arrow.png");
+            checkBox.setAttribute("src", "/assets/demo/image/arrow.png");
             checkBox.setAttribute("width", "5%");
             checkBox.setAttribute("id", key + "_check");
             let func: string;

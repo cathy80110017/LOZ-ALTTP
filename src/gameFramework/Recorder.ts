@@ -4,14 +4,12 @@ export default class Recorder {
   constructor() {
     this.record = [];
     this.waitCounter = 0;
-    this.recordDiv;
     this.isRecording = false;
     this.isPause = false;
   }
 
   private record: any[];
   private waitCounter: number;
-  private recordDiv: any;
   public isRecording: boolean;
   private isPause: boolean;
 
