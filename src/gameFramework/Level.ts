@@ -31,7 +31,7 @@ export default class Level {
 
   public get canvasChanged(): boolean {
     let isCanvasChanged = false;
-    this.traversalAllElement(function (ele) {
+    this.traversalAllElement((ele) => {
       if (ele.isObjectChanged) {
         isCanvasChanged = true;
       }
@@ -78,7 +78,7 @@ export default class Level {
 
   public update(): void {
     this.rootScene.clearDirtyFlag();
-    this.traversalAllElement(function (ele) {
+    this.traversalAllElement((ele) => {
       ele.clearDirtyFlag();
     });
     const preDraw = Date.now();
@@ -95,8 +95,13 @@ export default class Level {
     }
   }
 
+  protected _draw(ctx: CanvasRenderingContext2D): void {
+    return;
+  }
+
   public draw(ctx?: CanvasRenderingContext2D): void {
     this.rootScene.countAbsoluteProperty();
+
     /*this.traversalAllElement(function(ele) {
             ele.countAbsoluteProperty();
         })*/
@@ -123,6 +128,7 @@ export default class Level {
       const preDraw = Date.now();
 
       this.rootScene.draw(ctx);
+      this._draw(ctx);
 
       const drawTime = Date.now() - preDraw;
       this.timelist.push(drawTime);

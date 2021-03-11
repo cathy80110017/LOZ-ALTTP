@@ -149,7 +149,7 @@ export class myGameLevel1 extends Level {
     this.isPlayHit = this.firen.collide(this.freeze);
   }
 
-  public draw(parentCtx: CanvasRenderingContext2D): void {
+  public _draw(parentCtx: CanvasRenderingContext2D): void {
     this.rootScene.draw();
     //可支援畫各種單純的圖形和字
     parentCtx.fillStyle = this.secondHandRotationRate > 0 ? "green" : "red";

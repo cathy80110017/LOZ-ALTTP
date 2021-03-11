@@ -117,7 +117,7 @@ export default class myMenu extends GameMainMenu {
     this.scrollBar.update();
   }
 
-  public draw(parentCtx: CanvasRenderingContext2D): void {
+  public _draw(parentCtx: CanvasRenderingContext2D): void {
     //this.rootScene.draw();一定要在第一行
     this.rootScene.draw(parentCtx);
   }
