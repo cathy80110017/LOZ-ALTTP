@@ -8,9 +8,9 @@ export default class Scene extends GameObject {
   }
 
   public load(): void {
-    this.attachArray.forEach(function (ele) {
+    this.attachArray.forEach((ele) => {
       ele.load();
-    }, this);
+    });
   }
 
   public initTexture(): void {
@@ -28,6 +28,7 @@ export default class Scene extends GameObject {
   }
 
   public draw(painter?: GameObject | CanvasRenderingContext2D): void {
+    this.countAbsoluteProperty();
     painter = painter ?? this.Framework.game.context;
     //this.countAbsoluteProperty1();
 

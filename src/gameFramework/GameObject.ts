@@ -19,6 +19,7 @@ export default class GameObject {
     this.absoluteScale = 1;
     this.systemLayer = 1;
     //this.spriteParent = {}
+
     this.previousAbsolutePosition = new Point();
     this.previousWidth = 0;
     this.previousHeight = 0;
@@ -104,12 +105,12 @@ export default class GameObject {
   }
 
   public set position(newValue: xy) {
-    if (newValue.x) {
+    if (typeof newValue?.x !== "undefined") {
       this.relativePosition.x = Math.floor(newValue.x);
       //this._isMove = true;
     }
 
-    if (newValue.y) {
+    if (typeof newValue?.y !== "undefined") {
       this.relativePosition.y = Math.floor(newValue.y);
       //this._isMove = true;
     }
@@ -320,6 +321,7 @@ export default class GameObject {
 
     this.absoluteRotation = changedRotate;
     this.absoluteScale = changedScale;
+
     this.absolutePosition.x = changedPositionX;
     this.absolutePosition.y = changedPositionY;
 

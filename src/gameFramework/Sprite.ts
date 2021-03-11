@@ -133,8 +133,8 @@ export default class Sprite extends GameObject {
       } else {
         painter.drawImage(
           this.texture,
-          this.absolutePosition.x,
-          this.absolutePosition.y
+          this.absolutePosition.x - Number(this.texture.width) / 2,
+          this.absolutePosition.y - Number(this.texture.height) / 2
         );
       }
     }

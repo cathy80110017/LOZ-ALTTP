@@ -243,8 +243,9 @@ export default class AnimationSprite extends GameObject {
         const tmpContext = tmpCanvas.getContext("2d");
         tmpContext.drawImage(tmpImg, 0, 0);
         this._sprites.push(new Sprite(this.Framework, tmpCanvas));
-        this.texture = this._sprites[this.index];
       });
+
+      this.texture = this._sprites[this.index];
     }
 
     //}).call(this);

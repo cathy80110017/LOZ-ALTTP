@@ -165,7 +165,7 @@ export default class Level {
       height: 0,
     };
 
-    this.traversalAllElement(function (ele) {
+    this.traversalAllElement((ele) => {
       if (ele.isObjectChanged) {
         const nowDiagonal = Math.ceil(
           Math.sqrt(ele.width * ele.width + ele.height * ele.height)
@@ -218,7 +218,7 @@ export default class Level {
   }
 
   public showAllElement(): void {
-    this.traversalAllElement(function (ele) {
+    this.traversalAllElement((ele) => {
       console.log(
         ele,
         "ele.isMove",
