@@ -1,4 +1,4 @@
-import QUnit from "qunit";
+// import QUnit from "qunit";
 import EqualCondition from "./EqualCondition";
 import Game from "./Game";
 import { script } from "./interface";
@@ -56,7 +56,7 @@ class AssertionItem {
     }
     if (isEqual) {
       assertMessage = "Passed!";
-      QUnit.assert.ok(isEqual, assertMessage);
+      // QUnit.assert.ok(isEqual, assertMessage);
     } else {
       assertMessage =
         "Assert Fail! targetValue: " +
@@ -64,7 +64,7 @@ class AssertionItem {
         ", assertValue: " +
         this.assertValue;
       assertMessage += "\nFail at " + this.infoString;
-      QUnit.assert.ok(isEqual, assertMessage);
+      // QUnit.assert.ok(isEqual, assertMessage);
       //Framework.Game.pause()
     }
   }
@@ -163,7 +163,7 @@ export default class Replayer {
               //Framework.Game.pause()
               this.isTestEnd = true;
               this.hasExecuteCommand = false;
-              QUnit.start();
+              // QUnit.start();
             }
           }
         }
@@ -300,7 +300,7 @@ export default class Replayer {
       if (typeof this.waitingCondition !== "number") {
         timeoutMessage += "\nFail at " + this.waitingCondition.infoString;
       }
-      QUnit.assert.ok(false, timeoutMessage);
+      // QUnit.assert.ok(false, timeoutMessage);
       this.game.pause();
     }
   }
@@ -486,7 +486,7 @@ export default class Replayer {
   public startQUnit(): void {
     if (!this.isQUnitStart) {
       this.isQUnitStart = true;
-      QUnit.start();
+      // QUnit.start();
     }
   }
 
