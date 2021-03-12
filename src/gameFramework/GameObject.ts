@@ -54,7 +54,7 @@ export default class GameObject {
   public previousAbsolutePosition: Point;
   public previousWidth: number;
   public previousHeight: number;
-  public spriteParent?: GameObject; //TODO: check
+  public spriteParent?: GameObject;
   protected Framework: Framework;
 
   public get isObjectChanged(): boolean {
